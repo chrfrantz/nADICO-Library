@@ -115,6 +115,20 @@ public final class Attributes<T extends Set<String>> implements Serializable {
 		}
 		return this;
 	}
+
+	/**
+	 * Replaces specific current individual marker(s) of a given category with new one. Leaves all other marker categories unchanged.
+	 * @param markerCategory Category of marker to be replaced.
+	 * @param marker Marker value to be set associated with #markerCategory.
+	 * @return
+	 */
+	public Attributes<T> replaceIndividualMarker(final String markerCategory, final String marker) {
+		// Not optimal (since it enforces string), but sufficient at this stage.
+		T markers = (T) new LinkedHashSet<String>();
+		markers.add(marker);
+		individualMarkers.put(markerCategory, markers);
+		return this;
+	}
 	
 	/**
 	 * Replaces current individual markers with new ones. All old ones are removed, before new ones are added.
@@ -165,6 +179,20 @@ public final class Attributes<T extends Set<String>> implements Serializable {
 			// additional increment
 			i++;
 		}
+		return this;
+	}
+
+	/**
+	 * Replaces specific current social marker(s) of a given category with new one. Leaves all other marker categories unchanged.
+	 * @param markerCategory Category of marker to be replaced.
+	 * @param marker Marker value to be set associated with #markerCategory.
+	 * @return
+	 */
+	public Attributes<T> replaceSocialMarker(final String markerCategory, final String marker) {
+		// Not optimal (since it enforces string), but sufficient at this stage.
+		T markers = (T) new LinkedHashSet<String>();
+		markers.add(marker);
+		socialMarkers.put(markerCategory, markers);
 		return this;
 	}
 	
