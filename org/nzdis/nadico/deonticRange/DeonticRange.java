@@ -166,7 +166,7 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 	 * Should be called upon memory change to update boundaries. 
 	 * Works for all deontic range types.
 	 */
-	private void updateDeonticRange(){
+	private void updateDeonticRange() throws MemoryUpdateException {
 		if(nadicoGeneralizer != null){
 			// Check for valid values first
 			NAdicoExpression minExpr = nadicoGeneralizer.getStatementWithMinValence();
@@ -184,10 +184,10 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 				return;
 			}
 			if (minValence <= -Float.MAX_VALUE || minValence.isNaN() || minValence.isInfinite()) {
-				throw new RuntimeException(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside lower boundary of number range. Value: " + minValence);
+				throw new MemoryUpdateException(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside lower boundary of number range. Value: " + minValence);
 			}
 			if (maxValence >= Float.MAX_VALUE || maxValence.isNaN() || maxValence.isInfinite()) {
-				throw new RuntimeException(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside upper boundary of number range. Value: " + maxValence);
+				throw new MemoryUpdateException(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside upper boundary of number range. Value: " + maxValence);
 			}
 
 			switch(this.chosenType){
@@ -225,14 +225,15 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 					this.lowerBoundary = historyMemoryLower.getMeanOfAllEntries();
 					this.upperBoundary = historyMemoryUpper.getMeanOfAllEntries();
 					break;
+				default: throw new MemoryUpdateException("Deontic Range Update: Unknown deontic range type " + this.chosenType);
 			}
 		} else {
-			throw new RuntimeException("No nAdicoGeneralizer appears to be registered for the calculation of the deontic range.");
+			throw new MemoryUpdateException("No nAdicoGeneralizer appears to be registered for the calculation of the deontic range.");
 		}
 	}
 
 	@Override
-	public void memoryChanged(){
+	public void memoryChanged() throws MemoryUpdateException {
 		updateDeonticRange();
 	}
 	

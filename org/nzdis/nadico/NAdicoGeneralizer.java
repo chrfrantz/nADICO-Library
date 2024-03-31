@@ -9,6 +9,7 @@ import org.nzdis.nadico.components.Aim;
 import org.nzdis.nadico.components.Attributes;
 import org.nzdis.nadico.components.Conditions;
 import org.nzdis.nadico.deonticRange.DeonticRange;
+import org.nzdis.nadico.deonticRange.MemoryUpdateException;
 import org.nzdis.nadico.listener.NAdicoGeneralizationProvider;
 import org.nzdis.nadico.listener.NAdicoMemoryChangeListener;
 import org.sofosim.structures.Pair;
@@ -143,7 +144,7 @@ public class NAdicoGeneralizer {
 	/**
 	 * Notifies all currently registered listeners.
 	 */
-	protected void notifyMemoryChangeListeners(){
+	protected void notifyMemoryChangeListeners() throws MemoryUpdateException {
 		for(NAdicoMemoryChangeListener listener: this.listeners){
 			listener.memoryChanged();
 		}
@@ -698,7 +699,7 @@ public class NAdicoGeneralizer {
 	 * @return LinkedHashMap with generalised expressions in key (including aggregated input values as deontic) and collection of instances those have been derived from as value. 
 	 * Instances have the valences as their deontic values.
 	 */
-	public LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalizeValencedExpressions(final Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> valencednAdicoExpressions) {
+	public LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalizeValencedExpressions(final Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> valencednAdicoExpressions) throws MemoryUpdateException {
 		
 		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> exprs = 
 				NAdicoGeneralizerHelper.makeCopyOfValencedExpressions(valencednAdicoExpressions);
@@ -1065,8 +1066,12 @@ public class NAdicoGeneralizer {
 		// Cache them
 		this.cachedGeneralizedExprsHigherLevel.put(generalisationLevel, generalizedExprs);
 		// Call deontic range
-		notifyMemoryChangeListeners();
-		return generalizedExprs;
+        try {
+            notifyMemoryChangeListeners();
+        } catch (MemoryUpdateException e) {
+            throw new RuntimeException(e);
+        }
+        return generalizedExprs;
 	}
 	
 	/**
