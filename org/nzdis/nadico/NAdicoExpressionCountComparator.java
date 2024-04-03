@@ -23,7 +23,11 @@ public class NAdicoExpressionCountComparator implements Comparator<NAdicoExpress
 
 	@Override
 	public int compare(NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> o1, NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> o2) {
-		// Only reorder if more constituting statements (hence more generalization weight) - sorts in descending order
+		// Check for equality first
+		if (o1.count.equals(o2.count)) {
+			return 0;
+		}
+		// Only reordering if more constituting statements (hence more generalization weight) - sorts in descending order
 		if (this.ascendingOrder) {
 			return o1.count > o2.count ? 1: -1;
 		}
