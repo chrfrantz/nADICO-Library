@@ -80,7 +80,7 @@ public class nAdicoActionMemoryTest {
 	
 	@Before
 	public void setup() {
-		generaliser = new NAdicoGeneralizer(ownerOne, new NAdicoConfiguration(deonticRangeConfiguration));
+		generaliser = new NAdicoGeneralizer(ownerOne, "", new NAdicoConfiguration(deonticRangeConfiguration));
 		memory = new nAdicoActionMemory<>(numberOfMemoryEntries, ownerOne, generaliser);
 		
 		System.out.println("Test setup done.");

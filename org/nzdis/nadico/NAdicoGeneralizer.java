@@ -25,6 +25,12 @@ public class NAdicoGeneralizer {
 	 * Owner agent
 	 */
 	private final String owner;
+
+	/**
+	 * Contextual information helpful during debugging (e.g., instance reference).
+	 * Only printed for error output, not regular stdout.
+	 */
+	private final String context;
 	
 	/**
 	 * NAdicoConfiguration (including deontic range specification).
@@ -75,8 +81,9 @@ public class NAdicoGeneralizer {
 	 */
 	private boolean removeNonAttributeAimPropertiesDuringGeneralization = false;
 	
-	public NAdicoGeneralizer(final String owner, final NAdicoConfiguration config){
+	public NAdicoGeneralizer(final String owner, final String context, final NAdicoConfiguration config){
 		this.owner = owner;
+		this.context = context;
 		this.config = config;
 		// Initialize deontic range which automatically subscribes to NAdicoMemory (for registering changes)
 		this.deonticRange = new DeonticRange(this, this.config.deonticRangeConfig);
@@ -91,7 +98,13 @@ public class NAdicoGeneralizer {
 	public String getOwner() {
 		return this.owner;
 	}
-	
+
+	/**
+	 * Returns context information.
+	 * @return
+	 */
+	public String getContext() { return this.context; }
+
 	/**
 	 * Sets the aggregation strategy for valenced generalized statements 
 	 * produced with {@link #generalizeValencedExpressions(Map)}.

@@ -184,10 +184,10 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 				return;
 			}
 			if (minValence <= -Float.MAX_VALUE || minValence.isNaN() || minValence.isInfinite()) {
-				throw new MemoryUpdateException(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside lower boundary of number range. Value: " + minValence);
+				throw new MemoryUpdateException(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside lower boundary of number range. Value: " + minValence + "; Context: " + nadicoGeneralizer.getContext());
 			}
 			if (maxValence >= Float.MAX_VALUE || maxValence.isNaN() || maxValence.isInfinite()) {
-				throw new MemoryUpdateException(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside upper boundary of number range. Value: " + maxValence);
+				throw new MemoryUpdateException(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside upper boundary of number range. Value: " + maxValence + "; Context: " + nadicoGeneralizer.getContext());
 			}
 
 			switch(this.chosenType){
@@ -225,10 +225,10 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 					this.lowerBoundary = historyMemoryLower.getMeanOfAllEntries();
 					this.upperBoundary = historyMemoryUpper.getMeanOfAllEntries();
 					break;
-				default: throw new MemoryUpdateException("Deontic Range Update: Unknown deontic range type " + this.chosenType);
+				default: throw new MemoryUpdateException("Deontic Range Update: Unknown deontic range type " + this.chosenType + "; Context: " + nadicoGeneralizer.getContext());
 			}
 		} else {
-			throw new MemoryUpdateException("No nAdicoGeneralizer appears to be registered for the calculation of the deontic range.");
+			throw new MemoryUpdateException("No nAdicoGeneralizer appears to be registered for the calculation of the deontic range." + " Context: " + nadicoGeneralizer.getContext());
 		}
 	}
 
