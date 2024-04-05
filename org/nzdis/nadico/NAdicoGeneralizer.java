@@ -54,12 +54,6 @@ public class NAdicoGeneralizer {
 	private String aggregationStrategyGeneralization = AGGREGATION_STRATEGY_SUM;
 	
 	/**
-	 * Aggregation strategy for nADICO statements with same leading attributes and aim.
-	 * Effectively resolution mechanism for cognitive dissonance (Festinger).
-	 */
-	//protected String aggregationStrategyNAdicoExpressions = AGGREGATION_STRATEGY_SUM;
-	
-	/**
 	 * Summing Aggregation Strategy: Determines general statement's deontic based on sum of grouped instances.
 	 */
 	public static final String AGGREGATION_STRATEGY_SUM = "AGGREGATION_SUM";
