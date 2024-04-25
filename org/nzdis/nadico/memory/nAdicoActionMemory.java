@@ -9,7 +9,6 @@ import org.nzdis.nadico.components.Aim;
 import org.nzdis.nadico.components.Attributes;
 import org.nzdis.nadico.components.Conditions;
 import org.sofosim.environment.memoryTypes.DiscreteNonAggregatingMemory;
-import org.sofosim.environment.memoryTypes.util.MapValueComparator;
 
 public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends Conditions> extends DiscreteNonAggregatingMemory<NAdicoExpression<A, I, C>, Float> {
 
@@ -406,38 +405,106 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 				System.out.println("Matching statements after filtering by max value: (" + matchingStatements.size() + "):" + matchingStatements);
 			}
 		}
-		
 		return matchingStatements;
 	}
-	
-	/**
-	 * Constants for value aggregation.
-	 */
-	public static final int AGGREGATION_COUNT = 1;
-	public static final int AGGREGATION_MEAN = 2;
-	public static final int AGGREGATION_SUM = 3;
+
 
 	/**
 	 * Returns the memory entry (consisting of nADICO expression and associated value) with the highest value,
 	 * irrespective of content.
 	 * @return
 	 */
-	public Pair getMaxNAdicoExpression() {
+	public PairValueComparison<NAdicoExpression<A, I, C>, Number> getMaxNAdicoExpression() {
 
 		// Effectively act as helper function for API integrity
-		Pair pair = getKeyValuePairForHighestValue();
+		PairValueComparison<NAdicoExpression<A, I, C>, Number> pair = getKeyValuePairForHighestValue();
 
 		return pair;
-
 	}
 
 	/**
-	 * Returns list of memory entries ranked by values (highest to lowest).
+	 * Generalizes memorized statements and aggregates those based on given aggregation strategy #aggregationMode.
+	 * @param aggregationMode Aggregation mode
 	 * @return
 	 */
-	public List<Entry<NAdicoExpression<A, I, C>, Float>> getRankedNAdicoExpressions() {
-		List<Entry<NAdicoExpression<A, I, C>,Float>> list = new ArrayList<>(getAllEntries().entrySet());
-		Collections.sort(list, new MapValueComparator<NAdicoExpression<A, I, C>, Float>());
+	private HashMap<NAdicoExpression<A, I, C>, Float> generalizeAndAggregateGroupedNAdicoExpressions(int aggregationMode) {
+
+		// Map holding final entries
+		HashMap<NAdicoExpression<A, I, C>, DiscreteNonAggregatingMemory<NAdicoExpression<A, I, C>, Float>.CountSumEntry> intermediateMap = new HashMap<>();
+
+		// Memory entries to be processed
+		HashMap<NAdicoExpression<A, I, C>, DiscreteNonAggregatingMemory<NAdicoExpression<A, I, C>, Float>.CountSumEntry> entries = getCompleteEntries();
+
+		// Iterate through memory entry
+		for (Entry<NAdicoExpression<A, I, C>, CountSumEntry> entry : entries.entrySet()) {
+
+			// Generalize each memory entry before aggregation
+			NAdicoExpression<A, I, C> generalizedExpr = (NAdicoExpression<A, I, C>) generalizer.generalizeExpression((NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>) entry.getKey());
+
+			// Manage generalized expressions
+			if (!intermediateMap.containsKey(generalizedExpr)) {
+				intermediateMap.put(generalizedExpr, entry.getValue());
+			} else {
+				DiscreteNonAggregatingMemory<NAdicoExpression<A, I, C>, Float>.CountSumEntry tempEntry = entry.getValue();
+				intermediateMap.get(generalizedExpr).count += tempEntry.count;
+				intermediateMap.get(generalizedExpr).sum += tempEntry.sum;
+			}
+
+		}
+
+		// Perform final calculations
+
+		// Map holding final entries
+		HashMap<NAdicoExpression<A, I, C>, Float> outputMap = new HashMap<>();
+
+		System.out.println("Intermediate map " + owner + ": " + intermediateMap);
+
+		// Perform aggregation based on specified aggregation mode
+		for (NAdicoExpression<A, I, C> key: intermediateMap.keySet()) {
+
+			// Perform intended aggregation
+			switch (aggregationMode) {
+				case AGGREGATION_COUNT:
+					// Count of statements for entry
+					outputMap.put(key, (float)intermediateMap.get(key).count);
+					break;
+				case AGGREGATION_MEAN:
+					System.out.println("Applied mean");
+					// Mean value aggregation
+					outputMap.put(key, intermediateMap.get(key).sum/(float)intermediateMap.get(key).count);
+					break;
+				case AGGREGATION_SUM:
+					// Sum value
+					outputMap.put(key, intermediateMap.get(key).sum);
+					break;
+				default:
+					throw new RuntimeException("Unknown aggregation mode when returning entries: " + aggregationMode);
+			}
+		}
+		return outputMap;
+	}
+
+	/**
+	 * Returns list of memory entries ranked by values (highest to lowest) based on a given aggregation strategy.
+	 * @return
+	 */
+	public List<PairValueComparison<NAdicoExpression<A, I, C>, Float>> getRankedNAdicoExpressions(int aggregationMode) {
+
+		// Generalize and aggregate memory statements based on given strategy, before converting the structure
+		HashMap<NAdicoExpression<A, I, C>, Float> map = generalizeAndAggregateGroupedNAdicoExpressions(aggregationMode);
+
+		// List to be populated
+		List<PairValueComparison<NAdicoExpression<A, I, C>, Float>> list = new ArrayList<>();
+
+		// Iterate through generalized values
+		for (Entry<NAdicoExpression<A, I, C>, Float> entry: map.entrySet()) {
+			list.add(new PairValueComparison<NAdicoExpression<A, I, C>, Float>(entry.getKey(), entry.getValue()));
+		}
+
+		// Sort entries
+		list.sort(Comparator.comparing(PairValueComparison::getValue));
+		// Reverse order
+		Collections.sort(list, Collections.reverseOrder());
 		return list;
 	}
 

@@ -10,7 +10,7 @@ public class DeonticRangeConfiguration {
 	/**
 	 * The deontic range dynamically adapts over time by calculating the mean over historical boundary values.
 	 * This mode is the most flexible one with regards to the variation over time and allows the representation of 
-	 * memory/experience.
+	 * memory/experience. The history window needs to be specified for this range type upon initialization.
 	 */
 	public static final String DEONTIC_RANGE_TYPE_HISTORY_MIN_MAX = "History-based Min./Max. Values";
 	/**
@@ -21,11 +21,12 @@ public class DeonticRangeConfiguration {
 	public static final String DEONTIC_RANGE_TYPE_SITUATIONAL_MIN_MAX = "Situational Min./Max. Values";
 	/**
 	 * The deontic range is static once initialized and never changes. All intermediate deontics (SHOULD, SHOULD NOT, etc.) are mapped.
+	 * This is in contrast to {@link #DEONTIC_RANGE_TYPE_DISCRETE}, which only allows for the traditional deontics.
 	 */
 	public static final String DEONTIC_RANGE_TYPE_STATIC_MIN_MAX = "Static Min./Max. Values";
 	/**
 	 * The deontic range is fixed (similar to {@link #DEONTIC_RANGE_TYPE_STATIC_MIN_MAX}), but only offers/maps
-	 * discrete MUST, MAY, and MUST NOT. This is compatible with the conventional deontics concept.
+	 * discrete MUST, MAY, and MUST NOT (no intermediate deontic values). This is compatible with the conventional deontics concept.
 	 */
 	public static final String DEONTIC_RANGE_TYPE_DISCRETE = "Discrete Deontic Values";
 	

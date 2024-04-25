@@ -1082,7 +1082,7 @@ public class NAdicoGeneralizer {
 	}
 	
 	/**
-	 * Aggregates generalised instance expressions (generalisation occurs outside of method) and aggregates deontic values, while 
+	 * Aggregates generalised instance expressions (generalisation occurs outside of method) and aggregates deontic values (by addition), while
 	 * maintaining reference to the original (non-generalised) instance values.
 	 * @param generalizedExpressions Structure holding aggregated generalised expressions (<general,ArrayList<Instance>>)
 	 * @param generalizedInstanceExpression Generalised instance expression - generalisation of instanceExpression performed before calling this method

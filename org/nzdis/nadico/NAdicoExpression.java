@@ -584,13 +584,13 @@ public class NAdicoExpression<A extends Attributes, I extends Aim, C extends Con
 	}
 
 	/**
-	 * Checks whether any of the given activities is contained within the invoked
+	 * Checks whether any of the activities in the passed set is contained within the invoked
 	 * NestedExpression (on any level). Returns true if at least one of the given
-	 * activities is found at some nesting level. Otherwise it returns false.
+	 * activities is found at some nesting level. Otherwise, it returns false.
 	 * @param activities
 	 * @return
 	 */
-	public boolean containsAnyActivityRecursively(List<String> activities) {
+	public boolean containsAnyActivityRecursively(Set<String> activities) {
 		for (String act : activities) {
 			if (containsActivityRecursively(act)) {
 				return true;
@@ -773,6 +773,7 @@ public class NAdicoExpression<A extends Attributes, I extends Aim, C extends Con
 	 * Makes a deep copy of this expression but
 	 * allows passing a custom deontic range to be assigned
 	 * to the newly created expression.
+	 * Note: Very comprehensive, but very slow!
 	 * @param deonticRange
 	 * @return deep copy of this expression with passed deontic range assigned
 	 */
