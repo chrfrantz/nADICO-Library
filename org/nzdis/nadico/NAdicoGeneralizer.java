@@ -820,7 +820,8 @@ public class NAdicoGeneralizer {
 				copiedCombination = expression.makeCopy();	
 			}
 			for(NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> expr : copiedCombination.nestedExpressions){
-				expr = generalizeExpression(expr, generalizeCopy);
+				// The value for generalizeCopy should always be true to ensure in-situ generalisation
+				generalizeExpression(expr, generalizeCopy);
 			}
 			return copiedCombination;
 		} else if (expression.isAction()) {
@@ -849,7 +850,7 @@ public class NAdicoGeneralizer {
 	 * For individual markers it invokes registered NAdicoGeneralizationProvider.
 	 * If none are registered, individual markers are simply deleted.
 	 * Social markers are simply retained (as deemed generalised by design).
-	 * @param attributes
+	 * @param attributes Attributes to be generalised
 	 * @return
 	 */
 	private Attributes<LinkedHashSet<String>> generalizeAttributes(final Attributes<LinkedHashSet<String>> attributes){

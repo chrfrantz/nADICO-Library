@@ -9,6 +9,7 @@ import org.nzdis.nadico.components.Aim;
 import org.nzdis.nadico.components.Attributes;
 import org.nzdis.nadico.components.Conditions;
 import org.sofosim.environment.memoryTypes.DiscreteNonAggregatingMemory;
+import org.sofosim.environment.memoryTypes.util.PairValueComparison;
 
 public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends Conditions> extends DiscreteNonAggregatingMemory<NAdicoExpression<A, I, C>, Float> {
 
@@ -423,7 +424,8 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 	}
 
 	/**
-	 * Generalizes memorized statements and aggregates those based on given aggregation strategy #aggregationMode.
+	 * Generalizes memorized statements and aggregates those based on given aggregation strategy #aggregationMode. However, only aggregates statements
+	 * with same structural form (i.e., not across actions on different levels of a statement (e.g., ADICADIC vs ADIC).
 	 * @param aggregationMode Aggregation mode
 	 * @return
 	 */
@@ -457,7 +459,9 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 		// Map holding final entries
 		HashMap<NAdicoExpression<A, I, C>, Float> outputMap = new HashMap<>();
 
-		System.out.println("Intermediate map " + owner + ": " + intermediateMap);
+		if (debug || oneOffDebug) {
+			System.out.println("Intermediate map " + owner + ": " + intermediateMap);
+		}
 
 		// Perform aggregation based on specified aggregation mode
 		for (NAdicoExpression<A, I, C> key: intermediateMap.keySet()) {
@@ -465,15 +469,23 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 			// Perform intended aggregation
 			switch (aggregationMode) {
 				case AGGREGATION_COUNT:
+					if (debug || oneOffDebug) {
+						System.out.println("Applied aggregate function 'count'");
+					}
 					// Count of statements for entry
 					outputMap.put(key, (float)intermediateMap.get(key).count);
 					break;
 				case AGGREGATION_MEAN:
-					System.out.println("Applied mean");
+					if (debug || oneOffDebug) {
+						System.out.println("Applied aggregate function 'mean'");
+					}
 					// Mean value aggregation
 					outputMap.put(key, intermediateMap.get(key).sum/(float)intermediateMap.get(key).count);
 					break;
 				case AGGREGATION_SUM:
+					if (debug || oneOffDebug) {
+						System.out.println("Applied aggregate function 'sum'");
+					}
 					// Sum value
 					outputMap.put(key, intermediateMap.get(key).sum);
 					break;

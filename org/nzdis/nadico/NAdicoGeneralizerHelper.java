@@ -6,8 +6,20 @@ import java.util.Map.Entry;
 import org.nzdis.nadico.components.Aim;
 import org.nzdis.nadico.components.Attributes;
 import org.nzdis.nadico.components.Conditions;
+import org.sofosim.environment.memoryTypes.ForgetfulMemory;
+import org.sofosim.environment.memoryTypes.util.PairValueComparison;
 
 public class NAdicoGeneralizerHelper {
+
+	/**
+	 * NAdico Helper-specific debug switch
+	 */
+	public static boolean debug = false;
+
+	/**
+	 * Prefix for debug output
+	 */
+	private static final String PREFIX = "NAdicoGeneralizerHelper: ";
 
 	/**
 	 * Returns a map containing social markers, an aim's activity (without other properties) as key, and the deontic value associated with it as value.
@@ -18,8 +30,8 @@ public class NAdicoGeneralizerHelper {
 	 * @param useNormativeValenceInsteadOfValue Indicates whether normative valence (e.g. -1, 0, 1) is used instead of deontic value
 	 * @return see above
 	 */
-	public static LinkedHashMap<String, Float> getAimAndDeonticValue(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> cachedGeneralExpressions, boolean includeDeonticAsPartOfKey, boolean useNormativeValenceInsteadOfValue){
-		return generateNAdicoStmtAbbrAndDeontic(cachedGeneralExpressions, false, true, includeDeonticAsPartOfKey, null, null, useNormativeValenceInsteadOfValue);
+	public static LinkedHashMap<String, Float> getAimAndDeonticValue(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> cachedGeneralExpressions, boolean includeDeonticAsPartOfKey, HashSet<String> ignoredDeontics, boolean useNormativeValenceInsteadOfValue){
+		return generateNAdicoStmtAbbrAndDeontic(cachedGeneralExpressions, false, true, includeDeonticAsPartOfKey, null, ignoredDeontics, useNormativeValenceInsteadOfValue);
 	}
 	
 	/**
@@ -159,7 +171,7 @@ public class NAdicoGeneralizerHelper {
 	 */
 	public static boolean containsActivity(String containedActivity, Collection<NAdicoExpression> expressions){
 		if (containedActivity == null) {
-			throw new RuntimeException("Cannot test for null action.");
+			throw new RuntimeException(PREFIX + "Cannot test for null action.");
 		}
 		
 		for (NAdicoExpression entry: expressions) {
@@ -199,7 +211,7 @@ public class NAdicoGeneralizerHelper {
 	 */
 	public static Float getDeonticValueForStatementContainingActivity(String containedActivity, Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> cachedGeneralExpressions){
 		if (containedActivity == null) {
-			throw new RuntimeException("Cannot determine deontic value for null action.");
+			throw new RuntimeException(PREFIX + "Cannot determine deontic value for null action.");
 		}
 		
 		Float deonticValue = 0f;
@@ -235,6 +247,55 @@ public class NAdicoGeneralizerHelper {
 	 */
 	public static String getStringifiedAICStatement(NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> expression) {
 		return buildActivityString(expression, null, false, null, true, true, false, false).toString();
+	}
+
+	/**
+	 * Returns highest-ranking statement, with value being aggregated across all statements that contain this activity as initial expression.
+	 * @param rankedExpressions Ranked expressions to be filtered and for which values are partially aggregated
+	 * @param permissibleActions Permissible actions that are permissible
+	 * @return
+	 */
+	public static PairValueComparison<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float>
+		aggregateValueForMaxActivity(List<PairValueComparison<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float>> rankedExpressions, HashSet<String> permissibleActions) {
+
+		int rankedExpressionsIdx = 0;
+		// Identify only statements that contain permissible actions
+		while (!rankedExpressions.get(rankedExpressionsIdx).getKey().containsAnyActivityRecursively(permissibleActions)) {
+			if (debug) {
+				System.out.println(PREFIX + "Ranked expression '" + rankedExpressions.get(rankedExpressionsIdx) + "' does not contain any of the actions '" + permissibleActions + "'.");
+			}
+			rankedExpressionsIdx++;
+		}
+		// Return early if no statement contains it
+		if (rankedExpressions.size() < rankedExpressionsIdx + 1) {
+			if (debug) {
+				System.out.println(PREFIX + "Falling back to exploration due to lack of memory entries.");
+			}
+			return null;
+		}
+
+		// Extract maximum-ranked initial action
+		NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> maxExpr = rankedExpressions.get(rankedExpressionsIdx).getKey().getInitialExpressions(1);
+
+		float aggregateValue = 0f;
+		// Go through the remaining ones and aggregate value
+		for (int i = rankedExpressionsIdx; i < rankedExpressions.size(); i++) {
+			if (rankedExpressions.get(i).getKey().containsActivityRecursively(maxExpr.aim.activity)) {
+				if (debug) {
+					System.out.println(PREFIX + "Adding up values for activity '" + maxExpr.aim.activity + "' from expression " + rankedExpressions.get(i));
+				}
+				// Add up
+				aggregateValue += rankedExpressions.get(i).value;
+			}
+		}
+
+		if (debug) {
+			System.out.println(PREFIX + "Total value for action '" + maxExpr.aim.activity + "': " + aggregateValue);
+		}
+
+		PairValueComparison<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> outputPair = new PairValueComparison<>(maxExpr, aggregateValue);
+
+		return outputPair;
 	}
 	
 	/**
