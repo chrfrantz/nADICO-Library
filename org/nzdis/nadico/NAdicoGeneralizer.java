@@ -242,7 +242,7 @@ public class NAdicoGeneralizer {
 	
 	/**
 	 * Returns generated nADICO expressions on all possible levels of generalisation (organised by generalisation level, i.e. 0, 1, 2).
-	 * Requires previous call to {@link #deriveADICStatements(int)} or {@link #deriveADICStatements(LinkedHashMap, boolean)}.
+	 * Requires previous call to {@link #deriveADICStatements(int, Attributes)} or {@link #deriveADICStatements(LinkedHashMap, boolean, Attributes)}.
 	 * @return
 	 */
 	public LinkedHashMap<Integer, LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> getMultiLevelNAdicoExpressions() {
@@ -254,13 +254,15 @@ public class NAdicoGeneralizer {
 	 * to derive ADIC statements. Requires previous call to {@link #generalizeValencedExpressions(Map)} and operates 
 	 * on its cached expressions to derive nADICO statements.
 	 * The results are cached in {@link #cachedNAdicoStatements}.
-	 * This methods only work works on Level 0 generalisations.
+	 * This method only work works on Level 0 generalisations.
+	 * @param subjectiveAttributes Attribute set of subject from whose perspective generalisation and ADIC derivation is to be performed.
+	 *                                If set to null, last attribute set of respective statement is used as perspective.
 	 * @return
 	 */
 	@Inspect
-	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> deriveADICStatements(){
+	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> deriveADICStatements(Attributes<LinkedHashSet<String>> subjectiveAttributes){
 		// Assign for inspection
-		cachedNAdicoStatements = new LinkedHashSet<>(deriveADICStatements(cachedGeneralizedExprs, true));
+		cachedNAdicoStatements = new LinkedHashSet<>(deriveADICStatements(cachedGeneralizedExprs, false, subjectiveAttributes));
 		return cachedNAdicoStatements;
 	}
 	
@@ -269,11 +271,13 @@ public class NAdicoGeneralizer {
 	 * generated via {@link #generalizeValencedExpressionsOnHigherLevel(Map, int)}.
 	 * The results are cached in {@link #cachedNAdicoStatementsHigherLevel} with key being the level.
 	 * @param level Generalisation level of expressions to be used for nADICO statements
+	 * @param subjectAttributes Subject's attributes to reflect perspective from which the generalisation is performed.
+	 *                             If set to null, last attribute set of respective statement is used as perspective.
 	 * @return
 	 */
-	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> deriveADICStatements(int level){
+	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> deriveADICStatements(int level, Attributes<LinkedHashSet<String>> subjectAttributes){
 		// Assign for inspection
-		cachedNAdicoStatementsHigherLevel.put(level, deriveADICStatements(cachedGeneralizedExprsHigherLevel.get(level), false));
+		cachedNAdicoStatementsHigherLevel.put(level, deriveADICStatements(cachedGeneralizedExprsHigherLevel.get(level), false, subjectAttributes));
 		return cachedNAdicoStatementsHigherLevel.get(level);
 	}
 		
@@ -283,11 +287,12 @@ public class NAdicoGeneralizer {
 	 * and operates on its cached expressions passed as parameter to derive nADICO statements.
 	 * @param generalisedExpressions Generalised expressions (e.g. from {@link #cachedGeneralizedExprs} or value of map {@link #cachedGeneralizedExprsHigherLevel})
 	 * @param requireDifferingAttributesInPrecedingStatement Indicates whether a preceding expression needs to have a different attribute set to be considered monitored (Default: true for Level 0 generalisation, else false).
+	 * @param attributesOfSubject Attributes elements of subject from whose perspective the statements are to be evaluated from. If set to null, the attributes of the respective last statement in a sequence is used.
 	 * @return
 	 */
 	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> deriveADICStatements(
 			LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalisedExpressions,
-			boolean requireDifferingAttributesInPrecedingStatement){
+			boolean requireDifferingAttributesInPrecedingStatement, Attributes<LinkedHashSet<String>> attributesOfSubject){
 		
 		// Initialise result structure
 		ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> adics = new ArrayList<>();
@@ -322,8 +327,8 @@ public class NAdicoGeneralizer {
 			NAdicoExpression candidateMonitored = null;
 			
 			if (requireDifferingAttributesInPrecedingStatement) {
-				// Determine first nested expression with different attribute set
-				candidateMonitored = getPrecedingExpressionWithDifferentAttributes(expr.attributes, expr);
+				// Determine first nested expression with different attribute set - variably rely on provided subjective attribute set or assume last one in chain
+				candidateMonitored = getPrecedingExpressionWithDifferentAttributes(attributesOfSubject != null ? attributesOfSubject : expr.attributes, expr);
 			} else {
 				// Simply take previous expression
 				candidateMonitored = (NAdicoExpression) expr.conditions.getPreviousAction();

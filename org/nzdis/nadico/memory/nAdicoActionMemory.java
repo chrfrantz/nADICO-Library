@@ -950,4 +950,17 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 		}
 		return pass;
 	}
+
+	/**
+	 * Forgets information by reducing valence based multiplication with discount factor.
+	 */
+	@Override
+	public void forgetAtRoundEnd(float discountFactor) {
+		for (int i = 0; i < this.memoryArray.length; i++) {
+			// Iterate through all entries and multiply with discount factor.
+			if (this.memoryArray[i] != null) {
+				this.memoryArray[i].value *= discountFactor;
+			}
+		}
+	}
 } 
