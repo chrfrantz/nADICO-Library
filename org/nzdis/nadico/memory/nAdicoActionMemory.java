@@ -344,7 +344,7 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 			boolean compareGeneralisedStatements, boolean returnCompleteExpressionVsOnlyNextExpressionInSequence, 
 			boolean strictMatchOnConditionsVsWildcardMatch, int valueAggregationStrategy) {
 
-		if (valueAggregationStrategy != 1 && valueAggregationStrategy != 2 && valueAggregationStrategy != 3) {
+		if (valueAggregationStrategy != 1 && valueAggregationStrategy != 2 && valueAggregationStrategy != 3 && valueAggregationStrategy != 4) {
 			throw new RuntimeException("Invalid value aggregation strategy. Provided value: " + valueAggregationStrategy);
 		}
 
@@ -450,6 +450,7 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 				DiscreteNonAggregatingMemory<NAdicoExpression<A, I, C>, Float>.CountSumEntry tempEntry = entry.getValue();
 				intermediateMap.get(generalizedExpr).count += tempEntry.count;
 				intermediateMap.get(generalizedExpr).sum += tempEntry.sum;
+				intermediateMap.get(generalizedExpr).max = Math.max(intermediateMap.get(generalizedExpr).max, tempEntry.max);
 			}
 
 		}
@@ -488,6 +489,13 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 					}
 					// Sum value
 					outputMap.put(key, intermediateMap.get(key).sum);
+					break;
+				case AGGREGATION_MAX:
+					if (debug || oneOffDebug) {
+						System.out.println("Applied aggregate function 'max'");
+					}
+					// Max value
+					outputMap.put(key, intermediateMap.get(key).max);
 					break;
 				default:
 					throw new RuntimeException("Unknown aggregation mode when returning entries: " + aggregationMode);
@@ -569,11 +577,16 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 							numberOfPassedChecks++;
 							break;
 						case AGGREGATION_SUM:
+							// Sum values
 							result += memoryArray[i].value;
 							break;
 						case AGGREGATION_COUNT:
 							// Count matches
 							result++;
+							break;
+						case AGGREGATION_MAX:
+							// Maximum value
+							result = Math.max(result, memoryArray[i].value);
 							break;
 						default: throw new RuntimeException("Invalid aggregation method " + aggregationMethod + " in nAdicoActionMemory.");
 					}
