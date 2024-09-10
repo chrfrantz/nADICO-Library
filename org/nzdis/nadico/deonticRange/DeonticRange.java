@@ -22,6 +22,10 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 	@Inspect
 	private DeonticRangeConfiguration config = null;
 	/**
+	 * Indicates if console output is printed
+	 */
+	private boolean printConsoleOutput = false;
+	/**
 	 * Current lower boundary of deontic range
 	 */
 	protected Float lowerBoundary = null;
@@ -73,6 +77,7 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 			this.mapperClass = this.config.mapper;
 			System.out.println("Set up deontic value mapper implementation " + this.mapperClass.getSimpleName());
 		}
+		this.printConsoleOutput = config.printConsoleOutput;
 		initializeValueMapper();
 	}
 	
@@ -122,7 +127,9 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 			default: 
 				throw new RuntimeException("Deontic Range type unknown: " + rangeType);
 		}
-		System.out.println("Initialized Deontic Range: " + this.chosenType);
+		if (printConsoleOutput) {
+			System.out.println("Initialized Deontic Range: " + this.chosenType);
+		}
 	}
 	
 	/**
@@ -140,7 +147,9 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 		this.lowerBoundary = lowerBoundary;
 		this.upperBoundary = upperBoundary;
 		this.chosenType = DeonticRangeConfiguration.DEONTIC_RANGE_TYPE_STATIC_MIN_MAX;
-		System.out.println("Initialized Deontic Range: " + this.chosenType + ", lower boundary: " + this.lowerBoundary + ", upper boundary: " + this.upperBoundary);
+		if (printConsoleOutput) {
+			System.out.println("Initialized Deontic Range: " + this.chosenType + ", lower boundary: " + this.lowerBoundary + ", upper boundary: " + this.upperBoundary);
+		}
 	}
 	
 	/**
@@ -180,7 +189,9 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 				maxValence = nadicoGeneralizer.getStatementWithMaxValence().deontic;
 			}
 			if (minValence == null || maxValence == null) {
-				System.out.println("Ignored deontic range update since memory is empty.");
+				if (printConsoleOutput) {
+					System.out.println("Ignored deontic range update since memory is empty.");
+				}
 				return;
 			}
 			if (minValence <= -Float.MAX_VALUE || minValence.isNaN() || minValence.isInfinite()) {

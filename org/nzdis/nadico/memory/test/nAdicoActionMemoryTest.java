@@ -35,7 +35,8 @@ public class nAdicoActionMemoryTest {
             100, 
             0.05f, 
             0.05f, 
-            ZeroBasedEquiCompartmentDeonticValueMapper.class);
+            ZeroBasedEquiCompartmentDeonticValueMapper.class,
+			true);
 	
 	int numberOfMemoryEntries = 50;
 	
@@ -80,7 +81,7 @@ public class nAdicoActionMemoryTest {
 	
 	@Before
 	public void setup() {
-		generaliser = new NAdicoGeneralizer(ownerOne, "", new NAdicoConfiguration(deonticRangeConfiguration));
+		generaliser = new NAdicoGeneralizer(ownerOne, "", new NAdicoConfiguration(deonticRangeConfiguration, true));
 		memory = new nAdicoActionMemory<>(numberOfMemoryEntries, ownerOne, generaliser);
 		
 		System.out.println("Test setup done.");

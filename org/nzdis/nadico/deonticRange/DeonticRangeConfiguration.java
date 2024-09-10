@@ -55,18 +55,21 @@ public class DeonticRangeConfiguration {
 	 * @param toleranceAroundExtremeValuesInPercent Tolerance zone (in percent of total range) around extremes.
 	 * @param maximumMovementInDeonticCenter Tolerance around deontic centre
 	 * @param mapper Deontic Value Mapper to determine association of values with deontic compartments (DiscreteDeonticValueMapper, SymmetricDeonticValueMapper, ZeroBasedDeonticValueMapper).
+	 * @param printConsoleOutput Indicates whether console output produced by DeonticRange is printed to console.
 	 */
 	public DeonticRangeConfiguration(String deonticRangeType,
 			int deonticHistoryLength, 
 			float toleranceAroundExtremeValuesInPercent,
 			float maximumMovementInDeonticCenter,
-			Class<? extends DeonticValueMapper> mapper) {
+			Class<? extends DeonticValueMapper> mapper,
+			boolean printConsoleOutput) {
 		super();
 		this.deonticRangeType = deonticRangeType;
 		this.deonticHistoryLength = deonticHistoryLength;
 		this.toleranceAroundExtremeValuesInPercent = toleranceAroundExtremeValuesInPercent;
 		this.maximumMovementInDeonticCenter = maximumMovementInDeonticCenter;
 		this.mapper = mapper;
+		this.printConsoleOutput = printConsoleOutput;
 	}
 	
 	/**
@@ -82,6 +85,7 @@ public class DeonticRangeConfiguration {
 	 * @param toleranceAroundExtremeValuesInPercent Tolerance zone (in percent of total range) around extremes.
 	 * @param maximumMovementInDeonticCenter Tolerance around deontic centre
 	 * @param mapper Deontic Value Mapper to determine association of values with deontic compartments (DiscreteDeonticValueMapper, SymmetricDeonticValueMapper, ZeroBasedDeonticValueMapper).
+	 * @param printConsoleOutput Indicates whether console output produced by DeonticRange is printed to console.
 	 */
 	public DeonticRangeConfiguration(String deonticRangeType,
 			int deonticHistoryLength, 
@@ -89,7 +93,8 @@ public class DeonticRangeConfiguration {
 			float deonticRangeStaticLowerBoundary,
 			float toleranceAroundExtremeValuesInPercent,
 			float maximumMovementInDeonticCenter,
-			Class<? extends DeonticValueMapper> mapper) {
+			Class<? extends DeonticValueMapper> mapper,
+			boolean printConsoleOutput) {
 		super();
 		this.deonticRangeType = deonticRangeType;
 		this.deonticHistoryLength = deonticHistoryLength;
@@ -98,6 +103,7 @@ public class DeonticRangeConfiguration {
 		this.toleranceAroundExtremeValuesInPercent = toleranceAroundExtremeValuesInPercent;
 		this.maximumMovementInDeonticCenter = maximumMovementInDeonticCenter;
 		this.mapper = mapper;
+		this.printConsoleOutput = printConsoleOutput;
 	}
 	
 	/**
@@ -131,5 +137,10 @@ public class DeonticRangeConfiguration {
 	 * to terms. 
 	 */
 	protected Class<? extends DeonticValueMapper> mapper = null;
+	/**
+	 * Indicates whether console output is printed during execution (should be true by default, but
+	 * suppressing may render efficiency gains).
+	 */
+	protected boolean printConsoleOutput = true;
 	
 }

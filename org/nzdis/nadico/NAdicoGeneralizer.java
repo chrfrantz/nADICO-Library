@@ -298,7 +298,9 @@ public class NAdicoGeneralizer {
 		ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> adics = new ArrayList<>();
 		
 		if (generalisedExpressions == null || generalisedExpressions.isEmpty()) {
-			System.err.println("Cannot derive ADIC statements yet. Not enough data.");
+			if (config.printOutputToConsole) {
+				System.err.println("Cannot derive ADIC statements yet. Not enough data.");
+			}
 			return new LinkedHashSet<>(adics);
 		}
 		
