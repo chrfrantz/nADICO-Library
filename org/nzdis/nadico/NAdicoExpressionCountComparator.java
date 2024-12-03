@@ -7,7 +7,7 @@ import org.nzdis.nadico.components.Conditions;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 
-public class NAdicoExpressionCountComparator implements Comparator<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>  {
+public class NAdicoExpressionCountComparator implements Comparator<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>  {
 
 
 	private boolean ascendingOrder = true;
@@ -22,7 +22,7 @@ public class NAdicoExpressionCountComparator implements Comparator<NAdicoExpress
 
 
 	@Override
-	public int compare(NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> o1, NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> o2) {
+	public int compare(NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> o1, NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> o2) {
 		// Check for equality first
 		if (o1.count.equals(o2.count)) {
 			return 0;

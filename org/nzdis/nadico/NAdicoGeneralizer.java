@@ -68,7 +68,7 @@ public class NAdicoGeneralizer {
 	 */
 	public static final String AGGREGATION_STRATEGY_OPPORTUNISTIC = "AGGREGATION_OPP";
 	
-	protected NAdicoFactory<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> factory;
+	protected NAdicoFactory<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> factory;
 	
 	/**
 	 * Indicates whether non-Attribute aim properties are removed during generalization
@@ -223,14 +223,14 @@ public class NAdicoGeneralizer {
 	 * Cached nADICO statements from Level 0 Generalisation
 	 */
 	@Inspect
-	private LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> cachedNAdicoStatements = new LinkedHashSet<>();
+	private LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> cachedNAdicoStatements = new LinkedHashSet<>();
 	
 	/**
 	 * Returns generated nADICO expressions (from Level 0 Generalisation).
 	 * To retrieve action sequences prior to nADICO generation (i.e. no derived consequences), use {@link #getCachedGeneralizedValencedExpressions()}.
 	 * @return
 	 */
-	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> getNAdicoExpressions() {
+	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> getNAdicoExpressions() {
 		return cachedNAdicoStatements;
 	}
 	
@@ -238,14 +238,14 @@ public class NAdicoGeneralizer {
 	 * Cached map of nADICO statements from higher-level generalisations (organised by generalisation level).
 	 */
 	@Inspect
-	private LinkedHashMap<Integer, LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> cachedNAdicoStatementsHigherLevel = new LinkedHashMap<>();
+	private LinkedHashMap<Integer, LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> cachedNAdicoStatementsHigherLevel = new LinkedHashMap<>();
 	
 	/**
 	 * Returns generated nADICO expressions on all possible levels of generalisation (organised by generalisation level, i.e. 0, 1, 2).
 	 * Requires previous call to {@link #deriveADICStatements(int, Attributes)} or {@link #deriveADICStatements(LinkedHashMap, boolean, Attributes)}.
 	 * @return
 	 */
-	public LinkedHashMap<Integer, LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> getMultiLevelNAdicoExpressions() {
+	public LinkedHashMap<Integer, LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> getMultiLevelNAdicoExpressions() {
 		return cachedNAdicoStatementsHigherLevel;
 	}
 	
@@ -260,7 +260,7 @@ public class NAdicoGeneralizer {
 	 * @return
 	 */
 	@Inspect
-	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> deriveADICStatements(Attributes<LinkedHashSet<String>> subjectiveAttributes){
+	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> deriveADICStatements(Attributes<LinkedHashSet<String>> subjectiveAttributes){
 		// Assign for inspection
 		cachedNAdicoStatements = new LinkedHashSet<>(deriveADICStatements(cachedGeneralizedExprs, false, subjectiveAttributes));
 		return cachedNAdicoStatements;
@@ -275,7 +275,7 @@ public class NAdicoGeneralizer {
 	 *                             If set to null, last attribute set of respective statement is used as perspective.
 	 * @return
 	 */
-	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> deriveADICStatements(int level, Attributes<LinkedHashSet<String>> subjectAttributes){
+	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> deriveADICStatements(int level, Attributes<LinkedHashSet<String>> subjectAttributes){
 		// Assign for inspection
 		cachedNAdicoStatementsHigherLevel.put(level, deriveADICStatements(cachedGeneralizedExprsHigherLevel.get(level), false, subjectAttributes));
 		return cachedNAdicoStatementsHigherLevel.get(level);
@@ -290,12 +290,12 @@ public class NAdicoGeneralizer {
 	 * @param attributesOfSubject Attributes elements of subject from whose perspective the statements are to be evaluated from. If set to null, the attributes of the respective last statement in a sequence is used.
 	 * @return
 	 */
-	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> deriveADICStatements(
-			LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalisedExpressions,
+	public LinkedHashSet<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> deriveADICStatements(
+			LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> generalisedExpressions,
 			boolean requireDifferingAttributesInPrecedingStatement, Attributes<LinkedHashSet<String>> attributesOfSubject){
 		
 		// Initialise result structure
-		ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> adics = new ArrayList<>();
+		ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> adics = new ArrayList<>();
 		
 		if (generalisedExpressions == null || generalisedExpressions.isEmpty()) {
 			if (config.printOutputToConsole) {
@@ -305,7 +305,7 @@ public class NAdicoGeneralizer {
 		}
 		
 		// Copy generalized expressions
-		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>,ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> cacheCopy = 
+		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>,ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> cacheCopy =
 				NAdicoGeneralizerHelper.makeCopyOfExpressionMap(generalisedExpressions);
 		
 		if (debug) {
@@ -317,7 +317,7 @@ public class NAdicoGeneralizer {
 			System.out.println(" - ONE BY ONE -");
 		}
 		
-		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> fullExpr : cacheCopy.entrySet()) {
+		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> fullExpr : cacheCopy.entrySet()) {
 			
 			NAdicoExpression expr = fullExpr.getKey();
 			
@@ -567,20 +567,20 @@ public class NAdicoGeneralizer {
 	 * Cached generalized statements.
 	 */
 	@Inspect
-	private LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> cachedGeneralizedExprs = new LinkedHashMap<>();
+	private LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> cachedGeneralizedExprs = new LinkedHashMap<>();
 	
 	/**
 	 * Cached higher level generalised statements. Map key is level, Map value is a map containing generalized statements as key and associated action instances constituting the corresponding generalized statement as values.
 	 */
 	@Inspect
-	private LinkedHashMap<Integer,LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>>> cachedGeneralizedExprsHigherLevel = new LinkedHashMap<>();
+	private LinkedHashMap<Integer,LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>>> cachedGeneralizedExprsHigherLevel = new LinkedHashMap<>();
 	
 	/**
 	 * Returns generalized expressions. 
 	 * @return
 	 */
 	@Inspect
-	private Set<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> getGeneralizedExpressions(){
+	private Set<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> getGeneralizedExpressions(){
 		return cachedGeneralizedExprs.keySet();
 	}
 	
@@ -591,7 +591,7 @@ public class NAdicoGeneralizer {
 	 * To retrieve nADICO statements (i.e. action sequences including derived sanctions), use {@link #getNAdicoExpressions()}.
 	 * @return
 	 */
-	public LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> getCachedGeneralizedValencedExpressions(){
+	public LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> getCachedGeneralizedValencedExpressions(){
 		return cachedGeneralizedExprs;
 	}
 	
@@ -600,15 +600,15 @@ public class NAdicoGeneralizer {
 	 * @param minVsMax true indicating minimal value, false indicating maximal value
 	 * @return expression that matched min. or max. value
 	 */
-	private NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> getStatementWithExtremeValence(final boolean minVsMax){
+	private NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> getStatementWithExtremeValence(final boolean minVsMax){
 		Float extreme;
 		if (minVsMax) {
 			extreme = Float.MAX_VALUE;
 		} else {
 			extreme = -Float.MAX_VALUE;
 		}
-		NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> extremeStmt = null;
-		for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> expr: cachedGeneralizedExprs.keySet()) {
+		NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> extremeStmt = null;
+		for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> expr: cachedGeneralizedExprs.keySet()) {
 			if (minVsMax) {
 				//minimal
 				if (expr.deontic < extreme) {
@@ -630,7 +630,7 @@ public class NAdicoGeneralizer {
 	 * Returns statement with minimum valence.
 	 * @return
 	 */
-	public NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> getStatementWithMinValence(){
+	public NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> getStatementWithMinValence(){
 		return getStatementWithExtremeValence(true);
 	}
 	
@@ -638,7 +638,7 @@ public class NAdicoGeneralizer {
 	 * Returns statement with maximum valence.
 	 * @return
 	 */
-	public NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> getStatementWithMaxValence(){
+	public NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> getStatementWithMaxValence(){
 		return getStatementWithExtremeValence(false);
 	}
 	
@@ -647,17 +647,17 @@ public class NAdicoGeneralizer {
 	 * @param generalizedExpressions
 	 * @return Generalized expressions with greatest deviating deontic filled in leading statement's deontic field.
 	 */
-	private LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> assignMinMaxValuesBasedOnDeonticRange(final LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalizedExpressions) {
+	private LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> assignMinMaxValuesBasedOnDeonticRange(final LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> generalizedExpressions) {
 		Float normativeCenter = deonticRange.getNormativeCenter();
 		if (normativeCenter == null || Float.isNaN(normativeCenter) || Float.POSITIVE_INFINITY == normativeCenter || Float.NEGATIVE_INFINITY == normativeCenter) {
 			normativeCenter = 0f;
 		}
 		// Iterate over grouped structure
-		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>,ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalizedEntry: generalizedExpressions.entrySet()){
+		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>,ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> generalizedEntry: generalizedExpressions.entrySet()){
 			Float min = Float.MAX_VALUE;
 			Float max = -Float.MAX_VALUE;
 			for (int i = 0; i < generalizedEntry.getValue().size(); i++) {
-				NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> instanceAction = generalizedEntry.getValue().get(i);
+				NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> instanceAction = generalizedEntry.getValue().get(i);
 				if (instanceAction.deontic != null) {
 					if (instanceAction.deontic < min) {
 						min = instanceAction.deontic;
@@ -689,8 +689,8 @@ public class NAdicoGeneralizer {
 	 * @param generalizedExpressions generalized expressions holding sum of all instance deontics in deontic field.
 	 * @return Generalized expressions with mean deontic values, calculated by dividing sum of deontic values by number of instance statements.
 	 */
-	private LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> assignMeanValuesBasedOnDeonticRange(final LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>,ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalizedExpressions) {
-		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> entry: generalizedExpressions.entrySet()) {
+	private LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> assignMeanValuesBasedOnDeonticRange(final LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>,ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> generalizedExpressions) {
+		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> entry: generalizedExpressions.entrySet()) {
 			// Calculates mean value based on number of instance values for aggregated deontic value
 			entry.getKey().deontic = entry.getKey().deontic / (float)entry.getValue().size();
 		}
@@ -702,7 +702,7 @@ public class NAdicoGeneralizer {
 	 * @param expression
 	 * @return
 	 */
-	public NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> generalizeExpression(final NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> expression) {
+	public NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> generalizeExpression(final NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> expression) {
 		return generalizeExpression(expression, true);
 	}
 	
@@ -713,18 +713,18 @@ public class NAdicoGeneralizer {
 	 * @return LinkedHashMap with generalised expressions in key (including aggregated input values as deontic) and collection of instances those have been derived from as value. 
 	 * Instances have the valences as their deontic values.
 	 */
-	public LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalizeValencedExpressions(final Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> valencednAdicoExpressions) throws MemoryUpdateException {
+	public LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> generalizeValencedExpressions(final Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float> valencednAdicoExpressions) throws MemoryUpdateException {
 		
-		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> exprs = 
+		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float> exprs =
 				NAdicoGeneralizerHelper.makeCopyOfValencedExpressions(valencednAdicoExpressions);
 		
 		// Initialize generalized expressions structure
-		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalizedExprs = new LinkedHashMap<>();
+		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> generalizedExprs = new LinkedHashMap<>();
 		
 		// Now check individual expressions against existing generalised ones
-		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> entry: exprs.entrySet()){
+		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float> entry: exprs.entrySet()){
 			//new expression
-			final NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> generalNewInputExpr = generalizeExpression(entry.getKey(), true);
+			final NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> generalNewInputExpr = generalizeExpression(entry.getKey(), true);
 			if (entry.getKey().attributes.individualMarkers.isEmpty()) {
 				throw new RuntimeException("Individual attributes are empty in action observation: " + entry.getKey());
 			}
@@ -748,8 +748,8 @@ public class NAdicoGeneralizer {
 	 * @param generalizedExprs
 	 * @return
 	 */
-	private LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> assignStrategySpecificDeonticToGeneralizedExpressions(
-			LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalizedExprs){
+	private LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> assignStrategySpecificDeonticToGeneralizedExpressions(
+			LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> generalizedExprs){
 		if (aggregationStrategyGeneralization.equals(AGGREGATION_STRATEGY_OPPORTUNISTIC)) {
 			// Reiterate and assign max deviating value for generalized deontic
 			generalizedExprs = assignMinMaxValuesBasedOnDeonticRange(generalizedExprs);
@@ -819,21 +819,21 @@ public class NAdicoGeneralizer {
 	 * @param generalizeCopy If set to true, a copy of the expression is generalized. Otherwise, the generalization is directly performed on the input.
 	 * @return
 	 */
-	private NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> generalizeExpression(final NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> expression, final boolean generalizeCopy){
+	private NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> generalizeExpression(final NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> expression, final boolean generalizeCopy){
 		
 		if (expression.isCombination()) {
-			NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> copiedCombination = expression;
+			NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> copiedCombination = expression;
 			if (generalizeCopy) {
 				copiedCombination = expression.makeCopy();	
 			}
-			for(NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> expr : copiedCombination.nestedExpressions){
+			for(NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> expr : copiedCombination.nestedExpressions){
 				// The value for generalizeCopy should always be true to ensure in-situ generalisation
 				generalizeExpression(expr, generalizeCopy);
 			}
 			return copiedCombination;
 		} else if (expression.isAction()) {
 			// Assume generalisation of individual action (not full nADICO statement)
-			NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> generalizedAction = expression;
+			NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> generalizedAction = expression;
 			if (generalizeCopy) {
 				generalizedAction = expression.makeCopy(this.deonticRange);
 			}
@@ -890,8 +890,8 @@ public class NAdicoGeneralizer {
 	 * @param removeNonAttributeAimPropertiesDuringGeneralization Indicates whether non-Attributes in aim properties values are removed during generalization
 	 * @return
 	 */
-	private Aim<String> generalizeAim(final Aim<String> aim, boolean removeNonAttributeAimPropertiesDuringGeneralization){
-		Aim<String> am = new Aim<String>().copyFrom(aim);
+	private Aim<Float> generalizeAim(final Aim<Float> aim, boolean removeNonAttributeAimPropertiesDuringGeneralization){
+		Aim<Float> am = new Aim<Float>().copyFrom(aim);
 		// Check for attributes in property values and generalise those
 		for (Entry entry : am.properties.entrySet()) {
 			if (entry.getValue().getClass().equals(Attributes.class)) {
@@ -918,9 +918,9 @@ public class NAdicoGeneralizer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> action: con.properties.values()) {
+		for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> action: con.properties.values()) {
 			if (action.isCombination()) {
-				for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> entry: action.nestedExpressions) {
+				for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> entry: action.nestedExpressions) {
 					entry = generalizeExpression(entry, false);
 				}
 			} else {
@@ -946,9 +946,9 @@ public class NAdicoGeneralizer {
 	 * @param expressions
 	 * @return
 	 */
-	private int determineMaxNumberOfSocialMarkerAttributes(Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> expressions) {
+	private int determineMaxNumberOfSocialMarkerAttributes(Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float> expressions) {
 		int maxSocialAttributes = 0;
-		for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> expr: expressions.keySet()) {
+		for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> expr: expressions.keySet()) {
 			int numberOfSocialAttributes = expr.attributes.socialMarkers.size();
 			if (numberOfSocialAttributes > maxSocialAttributes) {
 				maxSocialAttributes = numberOfSocialAttributes;
@@ -968,12 +968,12 @@ public class NAdicoGeneralizer {
 	 * @param generalisationLevel
 	 * @return
 	 */
-	public LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalizeValencedExpressionsOnHigherLevel(
-			final Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> valencednAdicoExpressions, 
+	public LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> generalizeValencedExpressionsOnHigherLevel(
+			final Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float> valencednAdicoExpressions,
 			final int generalisationLevel) {
 		
 		// Initialize empty expressions
-		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> exprs = null;
+		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float> exprs = null;
 		
 		// Determine the maximum number of social markers
 		int maxSocialMarkers = determineMaxNumberOfSocialMarkerAttributes(valencednAdicoExpressions);
@@ -990,7 +990,7 @@ public class NAdicoGeneralizer {
 		exprs = NAdicoGeneralizerHelper.makeCopyOfValencedExpressions(valencednAdicoExpressions);
 		
 		// Initialize empty generalised expressions
-		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalizedExprs = new LinkedHashMap<>();
+		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> generalizedExprs = new LinkedHashMap<>();
 		
 		if (exprs == null) {
 			System.err.println("Input expressions are null. No generalisation possible.");
@@ -1028,9 +1028,9 @@ public class NAdicoGeneralizer {
 		}
 		
 		// Now check individual expressions against existing generalised ones
-		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> entry: exprs.entrySet()) {
+		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float> entry: exprs.entrySet()) {
 			// Generalise individual expression for comparison
-			final NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> generalNewInputExpr = generalizeExpression(entry.getKey(), true);
+			final NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> generalNewInputExpr = generalizeExpression(entry.getKey(), true);
 			
 			if (debug) {
 				System.out.println("Social markers of generalised instance expression: " + generalNewInputExpr.attributes.socialMarkers);
@@ -1052,7 +1052,7 @@ public class NAdicoGeneralizer {
 					//System.err.println("Contains " + filteredEntry + ": " + generalNewInputExpr);
 					
 					// Store as abstract statement (deep copy) and associate instance with it
-					NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> instanceCopy = 
+					NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> instanceCopy =
 							new NAdicoExpression<>(generalNewInputExpr);
 					
 					// Determine markers to replace existing ones
@@ -1098,10 +1098,10 @@ public class NAdicoGeneralizer {
 	 * @param value deontic value of instance expression (feedback)
 	 * @return
 	 */
-	private LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> aggregateExpressionInstances(
-			LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalizedExpressions, 
-			NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> generalizedInstanceExpression, 
-			NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> instanceExpression, 
+	private LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> aggregateExpressionInstances(
+			LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> generalizedExpressions,
+			NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> generalizedInstanceExpression,
+			NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> instanceExpression,
 			Float value) {
 		if (instanceExpression.attributes.individualMarkers.isEmpty()) {
 			throw new RuntimeException("Individual markers of attributes of action observation are empty: " + instanceExpression);
@@ -1111,8 +1111,8 @@ public class NAdicoGeneralizer {
 		if (!generalizedExpressions.isEmpty()) {
 			boolean added = false;
 			//check for existing general expressions and eventually add matching instance statement
-			for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>,
-					ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> generalEntry: generalizedExpressions.entrySet()) {
+			for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>,
+					ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> generalEntry: generalizedExpressions.entrySet()) {
 				if (debug) {
 					System.out.println("Checking existing" + System.getProperty("line.separator") + 
 							generalEntry.getKey() + System.getProperty("line.separator") + "against new" +
@@ -1143,7 +1143,7 @@ public class NAdicoGeneralizer {
 			}
 			if (!added) {
 				//add new general expression with instance statement
-				ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> newList = new ArrayList<>();
+				ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> newList = new ArrayList<>();
 				//save action value in action instance deontic
 				instanceExpression.deontic = value;
 				newList.add(instanceExpression);
@@ -1157,7 +1157,7 @@ public class NAdicoGeneralizer {
 			}
 		} else {
 			//add first element to general expressions
-			ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> newList = new ArrayList<>();
+			ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> newList = new ArrayList<>();
 			//save action value in action instance deontic
 			instanceExpression.deontic = value;
 			newList.add(instanceExpression);

@@ -4,6 +4,11 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+/**
+ * This class represents the aIm in a nADICO statement. Note that the type is not the characterization of the activity,
+ * but rather the value type for potential properties (e.g., extraction amounts).
+ * @param <T>
+ */
 public final class Aim<T> implements Serializable {
 
 	/**

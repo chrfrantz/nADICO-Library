@@ -361,14 +361,14 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 			if (generalizer == null) {
 				throw new RuntimeException("NAdicoGeneralizer has not been specified during instantiation of NAdicoMemory.");
 			}
-			newStmt = (NAdicoExpression<A, I, C>) generalizer.generalizeExpression((NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>) newStmt);
+			newStmt = (NAdicoExpression<A, I, C>) generalizer.generalizeExpression((NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>) newStmt);
 		}
 
 		for (NAdicoExpression<A, I, C> item : keys) {
 
 			// Generalise input statements if required
 			if (compareGeneralisedStatements) {
-				item = (NAdicoExpression<A, I, C>) generalizer.generalizeExpression((NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>) item);
+				item = (NAdicoExpression<A, I, C>) generalizer.generalizeExpression((NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>) item);
 			}
 			
 			// Only add new items if they do not already exist (with generalisation). Values should have already been correctly aggregated.
@@ -441,7 +441,7 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 		for (Entry<NAdicoExpression<A, I, C>, CountSumEntry> entry : entries.entrySet()) {
 
 			// Generalize each memory entry before aggregation
-			NAdicoExpression<A, I, C> generalizedExpr = (NAdicoExpression<A, I, C>) generalizer.generalizeExpression((NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>) entry.getKey());
+			NAdicoExpression<A, I, C> generalizedExpr = (NAdicoExpression<A, I, C>) generalizer.generalizeExpression((NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>) entry.getKey());
 
 			// Manage generalized expressions
 			if (!intermediateMap.containsKey(generalizedExpr)) {
@@ -563,7 +563,7 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 						throw new RuntimeException("NAdicoGeneralizer has not been specified during instantiation of NAdicoMemory.");
 					}
 					memoryEntry = (NAdicoExpression<A, I, C>) 
-							generalizer.generalizeExpression((NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>) memoryEntry);
+							generalizer.generalizeExpression((NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>) memoryEntry);
 				}
 				// Perform match on instances (match is exact, so all input needs to be generalised if operating on generalised expressions)
 				if (match(actionStatement, memoryEntry, false, strictMatchOnConditionsVsWildcardMatch)) {
@@ -868,7 +868,7 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 	 * @param aimToBeCompared
 	 * @return
 	 */
-	public static boolean matchAim(final Aim<String> newAim, final Aim<String> aimToBeCompared) {
+	public static boolean matchAim(final Aim<Float> newAim, final Aim<Float> aimToBeCompared) {
 		boolean pass = false;
 		if (newAim == null | (newAim.activity == null && newAim.properties.isEmpty())) {
 			// pass if aim or activity is null and if properties are empty
@@ -895,9 +895,10 @@ public class nAdicoActionMemory<A extends Attributes, I extends Aim, C extends C
 				}
 			}
 			//check properties (independent from activity, e.g. if two activities share property)
-			if (newAim.properties != null) {
-				for (Entry<String, String> property: newAim.properties.entrySet()) {
+			if (newAim.properties != null && !newAim.properties.isEmpty()) {
+				for (Entry<String, Float> property: newAim.properties.entrySet()) {
 					if (aimToBeCompared.properties.containsKey(property.getKey())) {
+						// TODO: Check whether comparison is relevant for Float values
 						if (aimToBeCompared.properties.get(property.getKey()).equals(property.getValue())) {
 							pass = true;
 						} else {

@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 import org.nzdis.nadico.components.Aim;
 import org.nzdis.nadico.components.Attributes;
 import org.nzdis.nadico.components.Conditions;
-import org.sofosim.environment.memoryTypes.ForgetfulMemory;
+
 import org.sofosim.environment.memoryTypes.util.PairValueComparison;
 
 public class NAdicoGeneralizerHelper {
@@ -30,7 +30,7 @@ public class NAdicoGeneralizerHelper {
 	 * @param useNormativeValenceInsteadOfValue Indicates whether normative valence (e.g. -1, 0, 1) is used instead of deontic value
 	 * @return see above
 	 */
-	public static LinkedHashMap<String, Float> getAimAndDeonticValue(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> cachedGeneralExpressions, boolean includeDeonticAsPartOfKey, HashSet<String> ignoredDeontics, boolean useNormativeValenceInsteadOfValue){
+	public static LinkedHashMap<String, Float> getAimAndDeonticValue(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> cachedGeneralExpressions, boolean includeDeonticAsPartOfKey, HashSet<String> ignoredDeontics, boolean useNormativeValenceInsteadOfValue){
 		return generateNAdicoStmtAbbrAndDeontic(cachedGeneralExpressions, false, true, includeDeonticAsPartOfKey, null, ignoredDeontics, useNormativeValenceInsteadOfValue);
 	}
 	
@@ -44,7 +44,7 @@ public class NAdicoGeneralizerHelper {
 	 * @param useNormativeValenceInsteadOfValue Indicates whether normative valence is used instead of deontic value
 	 * @return see above
 	 */
-	public static LinkedHashMap<String, Float> getStringifiedNAdicoStmtAndDeonticValue(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> cachedGeneralExpressions, boolean includeDeonticAsPartOfKey, boolean useNormativeValenceInsteadOfValue){
+	public static LinkedHashMap<String, Float> getStringifiedNAdicoStmtAndDeonticValue(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> cachedGeneralExpressions, boolean includeDeonticAsPartOfKey, boolean useNormativeValenceInsteadOfValue){
 		return generateNAdicoStmtAbbrAndDeontic(cachedGeneralExpressions, true, false, includeDeonticAsPartOfKey, null, null, useNormativeValenceInsteadOfValue);
 	}
 	
@@ -60,7 +60,7 @@ public class NAdicoGeneralizerHelper {
 	 * @param useNormativeValenceInsteadOfValue Indicates whether normative valence is used instead of deontic value
 	 * @return see above
 	 */
-	public static LinkedHashMap<String, Float> getStringifiedNAdicoStmtAndDeonticValue(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> cachedGeneralExpressions, boolean printAttributeValuesOnly, boolean includeDeonticAsPartOfKey, HashSet<String> ignoredKeys, boolean useNormativeValenceInsteadOfValue){
+	public static LinkedHashMap<String, Float> getStringifiedNAdicoStmtAndDeonticValue(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> cachedGeneralExpressions, boolean printAttributeValuesOnly, boolean includeDeonticAsPartOfKey, HashSet<String> ignoredKeys, boolean useNormativeValenceInsteadOfValue){
 		return generateNAdicoStmtAbbrAndDeontic(cachedGeneralExpressions, true, printAttributeValuesOnly, includeDeonticAsPartOfKey, ignoredKeys, null, useNormativeValenceInsteadOfValue);
 	}
 	
@@ -77,7 +77,7 @@ public class NAdicoGeneralizerHelper {
      * @param useNormativeValenceInsteadOfValue Indicates whether normative valence (e.g. -1, 0, 1) is used instead of deontic (e.g. SHOULD)
      * @return see above
      */
-    public static LinkedHashMap<String, Float> getStringifiedNAdicoStmtAndDeonticValue(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> cachedGeneralExpressions, boolean printAttributeValuesOnly, boolean includeDeonticAsPartOfKey, HashSet<String> ignoredKeys, HashSet<String> ignoredDeontics, boolean useNormativeValenceInsteadOfValue){
+    public static LinkedHashMap<String, Float> getStringifiedNAdicoStmtAndDeonticValue(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> cachedGeneralExpressions, boolean printAttributeValuesOnly, boolean includeDeonticAsPartOfKey, HashSet<String> ignoredKeys, HashSet<String> ignoredDeontics, boolean useNormativeValenceInsteadOfValue){
         return generateNAdicoStmtAbbrAndDeontic(cachedGeneralExpressions, true, printAttributeValuesOnly, includeDeonticAsPartOfKey, ignoredKeys, ignoredDeontics, useNormativeValenceInsteadOfValue);
     }
 	
@@ -94,13 +94,13 @@ public class NAdicoGeneralizerHelper {
 	 * @param useNormativeValenceInsteadOfDeonticString Indicates whether normative valence (e.g. -1, 0, 1) is used instead of deontic string based on deontic compartment (e.g. SHOULD)
 	 * @return
 	 */
-	private static LinkedHashMap<String, Float> generateNAdicoStmtAbbrAndDeontic(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, 
+	private static LinkedHashMap<String, Float> generateNAdicoStmtAbbrAndDeontic(Collection<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>,
 			Conditions<NAdicoExpression>>> cachedGeneralExpressions, boolean complex, boolean printAttributeValuesOnly, boolean includeDeonticAsPartOfKey, 
 			HashSet<String> ignoredKeys, HashSet<String> ignoredDeontics, boolean useNormativeValenceInsteadOfDeonticString) {
 		
 		LinkedHashMap<String, Float> valencedActivities = new LinkedHashMap<>();
 		
-		for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> entry: cachedGeneralExpressions) {
+		for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> entry: cachedGeneralExpressions) {
 			
 		    boolean includeStmtInOutput = true;
 		    // Check whether statement should be ignored in output based on deontic
@@ -110,7 +110,7 @@ public class NAdicoGeneralizerHelper {
 		        }
 		    }
 		    if (includeStmtInOutput) {
-    			NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> conds = entry;
+    			NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> conds = entry;
     			StringBuilder builder = new StringBuilder();
     			
     			// Develop string with activities
@@ -245,7 +245,7 @@ public class NAdicoGeneralizerHelper {
 	 * @param expression
 	 * @return
 	 */
-	public static String getStringifiedAICStatement(NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> expression) {
+	public static String getStringifiedAICStatement(NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> expression) {
 		return buildActivityString(expression, null, false, null, true, true, false, false).toString();
 	}
 
@@ -255,8 +255,8 @@ public class NAdicoGeneralizerHelper {
 	 * @param permissibleActions Permissible actions that are permissible
 	 * @return
 	 */
-	public static PairValueComparison<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float>
-		aggregateValueForMaxActivity(List<PairValueComparison<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float>> rankedExpressions, HashSet<String> permissibleActions) {
+	public static PairValueComparison<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float>
+		aggregateValueForMaxActivity(List<PairValueComparison<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float>> rankedExpressions, HashSet<String> permissibleActions) {
 
 		int rankedExpressionsIdx = 0;
 		// Identify only statements that contain permissible actions
@@ -275,7 +275,7 @@ public class NAdicoGeneralizerHelper {
 		}
 
 		// Extract maximum-ranked initial action
-		NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> maxExpr = rankedExpressions.get(rankedExpressionsIdx).getKey().getInitialExpressions(1);
+		NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> maxExpr = rankedExpressions.get(rankedExpressionsIdx).getKey().getInitialExpressions(1);
 
 		float aggregateValue = 0f;
 		// Go through the remaining ones and aggregate value
@@ -293,7 +293,7 @@ public class NAdicoGeneralizerHelper {
 			System.out.println(PREFIX + "Total value for action '" + maxExpr.aim.activity + "': " + aggregateValue);
 		}
 
-		PairValueComparison<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> outputPair = new PairValueComparison<>(maxExpr, aggregateValue);
+		PairValueComparison<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float> outputPair = new PairValueComparison<>(maxExpr, aggregateValue);
 
 		return outputPair;
 	}
@@ -312,7 +312,7 @@ public class NAdicoGeneralizerHelper {
 	 * @param useNormativeValenceInsteadOfValue Indicates if the deontic valence should be shown instead of the value
 	 * @return StringBuilder instance including explored expression
 	 */
-	private static StringBuilder buildActivityString(NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> expression, StringBuilder builder, 
+	private static StringBuilder buildActivityString(NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> expression, StringBuilder builder,
 	        boolean extended, HashSet<String> ignoredKeys, boolean onlyPrintAttributeValues, boolean includeConditionsAttributes, boolean includeDeonticInOutput, boolean useNormativeValenceInsteadOfValue) {
 		if (builder == null) {
 			builder = new StringBuilder();
@@ -374,7 +374,7 @@ public class NAdicoGeneralizerHelper {
 						for (Entry props: expression.conditions.properties.entrySet()) {
 							if (ignoredKeys == null || !ignoredKeys.contains(props.getKey())) {
 								builder.append(props.getKey()).append("-");
-								builder = buildActivityString((NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>) props.getValue(), builder, 
+								builder = buildActivityString((NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>) props.getValue(), builder,
 								        extended, ignoredKeys, onlyPrintAttributeValues, includeConditionsAttributes, includeDeonticInOutput, useNormativeValenceInsteadOfValue);
 							}
 							// Increase counter independent of actual printing
@@ -388,7 +388,7 @@ public class NAdicoGeneralizerHelper {
 				}
 			} else {
 				// Check for nested expressions
-				Iterator<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> it = expression.nestedExpressions.iterator();
+				Iterator<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> it = expression.nestedExpressions.iterator();
 				if (it.hasNext()) {
 					builder.append("(");
 				}
@@ -411,13 +411,13 @@ public class NAdicoGeneralizerHelper {
 	 * @param valencedExpressions
 	 * @return
 	 */
-	public static LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> 
-		makeCopyOfValencedExpressions(Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> valencedExpressions) {
+	public static LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float>
+		makeCopyOfValencedExpressions(Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float> valencedExpressions) {
 		
-		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> copy = new LinkedHashMap<>();
+		LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float> copy = new LinkedHashMap<>();
 		
 		// Omitted null check for performance reasons
-		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>, Float> entry: valencedExpressions.entrySet()) {
+		for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float> entry: valencedExpressions.entrySet()) {
 			copy.put(new NAdicoExpression<>(entry.getKey()), entry.getValue().floatValue());
 		}
 		
@@ -429,17 +429,17 @@ public class NAdicoGeneralizerHelper {
 	 * @param mappedGeneralisationAndInstances
 	 * @return
 	 */
-	public static LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>,ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> 
-		makeCopyOfExpressionMap(Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>,ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> mappedGeneralisationAndInstances) {
+	public static LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>,ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>>
+		makeCopyOfExpressionMap(Map<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>,ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> mappedGeneralisationAndInstances) {
 			
-			LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>,
-				ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> copy = new LinkedHashMap<>();
+			LinkedHashMap<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>,
+				ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> copy = new LinkedHashMap<>();
 			
-			for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>,
-					ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>>> entry: mappedGeneralisationAndInstances.entrySet()) {
+			for (Entry<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>,
+					ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>>> entry: mappedGeneralisationAndInstances.entrySet()) {
 				
-				ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>>> copiedValues = new ArrayList<>();
-				for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<String>, Conditions<NAdicoExpression>> expr: entry.getValue()) {
+				ArrayList<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>> copiedValues = new ArrayList<>();
+				for (NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>> expr: entry.getValue()) {
 					copiedValues.add(new NAdicoExpression<>(expr));
 				}
 				
