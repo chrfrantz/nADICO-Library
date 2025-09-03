@@ -258,6 +258,11 @@ public class NAdicoGeneralizerHelper {
 	public static PairValueComparison<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float>
 		aggregateValueForMaxActivity(List<PairValueComparison<NAdicoExpression<Attributes<LinkedHashSet<String>>, Aim<Float>, Conditions<NAdicoExpression>>, Float>> rankedExpressions, HashSet<String> permissibleActions) {
 
+		// Check whether expressions are empty
+		if (rankedExpressions.isEmpty()) {
+			return null;
+		}
+
 		int rankedExpressionsIdx = 0;
 		// Identify only statements that contain permissible actions
 		while (!rankedExpressions.get(rankedExpressionsIdx).getKey().containsAnyActivityRecursively(permissibleActions)) {

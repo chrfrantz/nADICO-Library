@@ -158,7 +158,8 @@ public class ZeroBasedEquiCompartmentDeonticValueMapper extends DeonticValueMapp
 			Float valueInOppositeDirection = fraction * ScaleDifferenceCalculator.calculateDifferenceOnScale(center(), range.upperBoundary);
 			//return absolute value
 			return center() + valueInOppositeDirection;
-		} else if (value.equals(center())) {
+		} else if (value.floatValue() == center().floatValue()) {
+			// explicitly uses equality comparator to capture equality of -0.0 and 0.0
 			return value;
 		}
 		throw new RuntimeException("Inversion of value should always be possible. Check deontic range. Value: " + value + ", Deontic Range: " + range);
