@@ -134,15 +134,15 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 	
 	/**
 	 * Sets up static deontic range between specified values.
-	 * @param lowerBoundary
-	 * @param upperBoundary
+	 * @param lowerBoundary Lower boundary value
+	 * @param upperBoundary Upper boundary value
 	 */
 	private void setupStaticRange(Float lowerBoundary, Float upperBoundary){
 		if(lowerBoundary == null){
 			throw new RuntimeException("Initialized static Deontic Range without specifying lower boundary.");
 		}
 		if(upperBoundary == null){
-			throw new RuntimeException("Initialized static Deontic Range without specifying lower boundary.");
+			throw new RuntimeException("Initialized static Deontic Range without specifying upper boundary.");
 		}
 		this.lowerBoundary = lowerBoundary;
 		this.upperBoundary = upperBoundary;
@@ -195,10 +195,18 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 				return;
 			}
 			if (minValence <= -Float.MAX_VALUE || minValence.isNaN() || minValence.isInfinite()) {
-				throw new MemoryUpdateException(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside lower boundary of number range. Value: " + minValence + "; Context: " + nadicoGeneralizer.getContext());
+				minValence = -Float.MAX_VALUE;
+				this.lowerBoundary = minValence;
+				if (printConsoleOutput) {
+					System.out.println(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside lower boundary of number range. Value: " + minValence + "; Context: " + nadicoGeneralizer.getContext());
+				}
 			}
 			if (maxValence >= Float.MAX_VALUE || maxValence.isNaN() || maxValence.isInfinite()) {
-				throw new MemoryUpdateException(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside upper boundary of number range. Value: " + maxValence + "; Context: " + nadicoGeneralizer.getContext());
+				maxValence = Float.MAX_VALUE;
+				this.upperBoundary = maxValence;
+				if (printConsoleOutput) {
+					System.out.println(nadicoGeneralizer.getOwner() + ": Deontic Range - Update failed, since input value is outside upper boundary of number range. Value: " + maxValence + "; Context: " + nadicoGeneralizer.getContext());
+				}
 			}
 
 			switch(this.chosenType){
@@ -320,7 +328,7 @@ public class DeonticRange implements NAdicoMemoryChangeListener{
 	}
 
 	/**
-	 * Returns the valence for a given value, i.e. 
+	 * Returns the valence for a given value, i.e.,
 	 * indicates if it is positive (1), neutral (0) 
 	 * or negative (-1).
 	 * @param valence
